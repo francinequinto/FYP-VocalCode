@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VocalCode Canvas</title>
+
+    <!-- load fabric.js from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    
+    <!-- Application Header -->
+    <div class="header">
+        <h1 class="title">
+            <span>V</span><span>o</span><span>c</span><span>a</span><span>l</span><span>C</span><span>o</span><span>d</span><span>e</span>
+        </h1>
+        <button id="helpBtn" class="help-btn" title="How to play">?</button>
+    </div>
+
+    <!-- Help & Instructions Modal -->
+     <div id="helpModal" class="modal-backdrop" style="display: none;">
+        <div class="model-card">
+            <div class="modal-header">
+                <h2>How to Play with VocalCode!</h2>
+                <button id="closeHelpBtn" class="modal-close">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="step-guide">
+                    <div class="guide-step">
+                        <span class="step-num">1</span>
+                        <p>Select or upload your sprites & background on the left.</p>
+                    </div>
+                    <div class="guide-step">
+                        <span class="step-num">2</span>
+                        <p>Press <strong>Start Recording</strong>, speak clearly, then wait for the magic to happen!</p>
+                    </div>
+                    <div class="guide-step">
+                        <span class="step-num">3</span>
+                        <p>Watch Llama 3 write the Python code that moves the canvas!</p>
+                    </div>
+                </div>
+
+                <h3>Here are some commands you can try:</h3>
+                <div class="examples-grid">
+                    <div class="example-chip" data-cmd="Move the chicken to the boy.">
+                        <span>📍 Positioning</span>
+                        <p>"Move the chicken to the boy."</p>
+                    </div>
+                    <div class="example-chip" data-cmd="Make the chicken spin 4 times.">
+                        <span>🔄 Multi-Spin</span>
+                        <p>"Make the chicken spin 4 times".</p>
+                    </div>
+                    <div class="example-chip" data-cmd="Make the boy walk all the way to the right.">
+                        <span>🏃🏻‍♂️ Continuous Loops</span>
+                        <p>"Make the boy walk all away to the right."</p>
+                    </div>
+                    <div class="example-chip" data-cmd="Make the tree 3 times bigger.">
+                        <span>🔍 Scaling</span>
+                        <p>"Make the tree 3 times bigger."</p>
+                    </div>
+                    <div class="example-chip" data-cmd="Move all animals to the bottom right.">
+                        <span>🐾 Group Selection</span>
+                        <p>"Move all animals to the bottom right."</p>
+                    </div>
+                    <div class="example-chip" data-cmd="Delete the chicken.">
+                        <span>🗑️ Sprite Deletion</span>
+                        <p>"Delete the chicken."</p>
+                    </div>
+                </div>
+                <p class="modal-tip">Tip: Clicking any example card above will automatically test that command!</p>
+            </div>
+        </div>
+     </div>
+
+     <!-- Dashboard Container -->
+    <div class="dashboard">
+        <!-- Left Panel: Assets -->
+         <div class="left-panel">
+            <div class="tab-container">
+                <button id="tab-sprites" class="tab-btn active">Sprites</button>
+                <button id="tab-backgrounds" class="tab-btn">Backdrops</button>
+            </div>
+
+            <!-- Sprite Tab -->
+            <div id="content-sprites" class="tab-content" style="display: flex;">
+                <div class="sprite-grid">
+                    <button class="sprite-item library-btn" data-type="boy">
+                        <img src="assets/boy.png" alt="boy" class="library-thumb">
+                        <span>Boy</span>
+                    </button>
+
+                    <button class="sprite-item library-btn" data-type="chicken">
+                        <img src="assets/chicken.png" alt="chicken" class="library-thumb">
+                        <span>Chicken</span>
+                    </button>
+
+                    <button class="sprite-item library-btn" data-type="sheep">
+                        <img src="assets/sheep.png" alt="sheep" class="library-thumb">
+                        <span>Sheep</span>
+                    </button>
+                        
+                    <button class="sprite-item library-btn" data-type="cow">
+                        <img src="assets/cow.png" alt="cow" class="library-thumb">
+                        <span>Cow</span>
+                    </button>
+
+                    <button class="sprite-item library-btn" data-type="tree">
+                        <img src="assets/tree.png" alt="tree" class="library-thumb">
+                        <span>Tree</span>
+                    </button>
+                </div>
+                <button id="spriteBtn" class="panel-btn upload-btn">Upload Sprite</button>
+            </div>
+
+            <!-- Background Tab -->
+            <div id="content-backgrounds" class="tab-content" style="display: none;">
+                <div class="sprite-grid">
+                    <button class="sprite-item bg-library-btn" data-type="farm_bg">
+                        <img src="assets/farm_bg.png" alt="farm" class="library-thumb bg-thumb">
+                        <span>Farm</span>
+                    </button>
+
+                    <button class="sprite-item bg-library-btn" data-type="forest_bg">
+                        <img src="assets/forest_bg.png" alt="forest" class="library-thumb bg-thumb">
+                        <span>Forest</span>
+                    </button>
+                </div>
+                <button id="bgBtn" class="panel-btn upload-btn">Upload Backdrop</button>
+            </div>
+
+            <!-- File Input Triggers -->
+             <input type="file" id="bgUpload" accept="image/*" style="display: none;">
+             <input type="file" id="spriteUpload" accept="image/*" style="display: none;">
+         </div>
+
+         <!-- Center Panel: Canvas & Speech -->
+          <div class="center-panel">
+            <div class="canvas-container-custom">
+                <canvas id="c" width="800" height="500"></canvas>
+                <!-- Coordinate Tool -->
+                 <div id="coordTooltip" class="coord-tooltip" style="display: none;"></div>
+            </div>
+
+            <div class="center-bottom">
+                <div class="record-controls">
+                    <button id="recordBtn" class="action-btn">Start Recording</button>
+                    <button id="resetBtn" class="action-btn">Reset</button>
+                </div>
+
+                     <!-- Transcription & Command History Strip -->
+                    <div class="transcription-box">
+                        <div class="transcript-header">
+                            <span id="transcriptLabel">Voice Transcript</span>
+                            <span id="soundTag" class="sound-tag" style="display: none;"></span>
+                            <div id="bgCaption" style="font-size: 13px; font-weight: bold; margin-top: 10px;"></div>
+                            <span id="statusIndicator" class="status-waiting">Status: Ready</span>
+                        </div>
+                        <div id="transcriptText" style="font-style: italic; color: #555;">"Your voice command will appear here..."</div>
+                        <div id="historyPills" class="history-pills-container"></div>
+                      </div>
+                </div>
+            </div>
+
+          <!-- Right Panel: Python Terminal -->
+           <div class="right-panel">
+                <h3 style="margin-top: 0; text-align: center; color: #333">Python Terminal</h3>
+                <pre id="codeOutput">Awaiting command...</pre>
+           </div>
+    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>
+    
