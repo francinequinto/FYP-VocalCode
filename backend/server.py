@@ -122,26 +122,26 @@ def apply_semantic_correction(transcript, canvas_metadata, distance_threshold=2)
 
 def sanitize_and_clamp_sprites(sprites: list, max_x: float, max_y: float) -> list:
     """
-    Validates, clamps, and sanitizes sprite dictionary attributes modified by LLM-generated code.
+    Validates, clamps, and sanitises sprite dictionary attributes modified by LLM-generated code.
     Ensures that values conform to numeric boundaries and guarantees continuous velocity fields.
     """
     for sprite in sprites:
         sprite["x"] = clamp_position(sprite.get("x", 0), 0, max_x)
         sprite["y"] = clamp_position(sprite.get("y", 0), 0, max_y)
 
-        # Clamp normalized scale multiplier between 0.2x and 5.0x
+        # clamp normalised scale multiplier between 0.2x and 5.0x
         try:
             sprite["scale"] = max(0.2, min(float(sprite.get("scale", 1.0)), 5.0))
         except (ValueError, TypeError):
             sprite["scale"] = 1.0
 
-        # Preserve cumulative rotation angles for multi-revolution animations (DO NOT modulo % 360)
+        # preserve cumulative rotation angles for multi-revolution animations
         try:
             sprite["angle"] = float(sprite.get("angle", 0.0))
         except (ValueError, TypeError):
             sprite["angle"] = 0.0
 
-        # Ensure physical continuous velocities are valid floats
+        # ensure physical continuous velocities are valid floats
         sprite["vx"] = float(sprite.get("vx", 0.0))
         sprite["vy"] = float(sprite.get("vy", 0.0))
         sprite["v_angle"] = float(sprite.get("v_angle", 0.0))
